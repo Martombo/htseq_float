@@ -100,12 +100,14 @@ class SimParalog:
         return rand_nbinom
 
     def sim_counts(self, mean):
+        """compute gene counts, given a mean and setup."""
         tot_counts = [self.sim_nbinom(mean) for k in range(self.num_reps)]
         unambig_counts = [self.sim_unambig_counts(counts) for counts in tot_counts]
         ambig_counts = [tot_counts[k] - unambig_counts[k] for k in range(self.num_reps)]
         return tot_counts, unambig_counts, ambig_counts
 
     def run_sim(self, mean1, mean2):
+        """run a simulation of 2 paralogs with mean1 and mean2."""
         counts = Counts(self.sim_counts(mean1))
         counts.add_paralog(self.sim_counts(mean2))
         return counts
@@ -116,14 +118,12 @@ true_fc = 2
 unambig_err = 0
 distr_err = 0
 distr_rep_err = 0
-for k in range(100):
-    countsA = x.run_sim(1000,2000)
-    countsB = x.run_sim(2000,2000)
-    unambig_fc = np.mean(countsB.unambig1 / countsA.unambig1)
-    distr_fc = np.mean(countsB.distr1 / countsA.distr1)
-    distr_rep_fc = np.mean(countsB.distr_rep1 / countsA.distr_rep1)
-    print unambig_fc, distr_fc, distr_rep_fc
-    unambig_err += (true_fc - unambig_fc) ** 2
-    distr_err += (true_fc - distr_fc) ** 2
-    distr_rep_err += (true_fc - distr_rep_fc) ** 2
-print np.mean(unambig_err), np.mean(distr_err), np.mean(distr_rep_err)
+countsA = x.run_sim(1000,2000)
+countsB = x.run_sim(2000,2000)
+unambig_fc = np.mean(countsB.unambig1 / countsA.unambig1)
+distr_fc = np.mean(countsB.distr1 / countsA.distr1)
+distr_rep_fc = np.mean(countsB.distr_rep1 / countsA.distr_rep1)
+print 'unambig1 ' + ' '.join(str(int(round(x))) for x in countsA.unambig1.tolist() + countsB.unambig1.tolist())
+print 'unambig2 ' + ' '.join(str(int(round(x))) for x in countsA.unambig2.tolist() + countsB.unambig2.tolist())
+print 'distr1 ' + ' '.join(str(int(round(x))) for x in countsA.distr1.tolist() + countsB.distr1.tolist())
+print 'distr2 ' + ' '.join(str(int(round(x))) for x in countsA.distr2.tolist() + countsB.distr2.tolist())
